@@ -3,18 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>CloudNet Quest</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
       html {
         scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
       }
       body {
-        font-family: 'Google Sans', 'Outfit', sans-serif;
-        background-color: #F8F9FA;
-        color: #3C4043;
+        font-family: 'Outfit', sans-serif;
+        background-color: #F2F3F3;
+        color: #232F3E;
+        overflow-x: hidden;
+        touch-action: manipulation;
       }
       /* Animated Traffic Flow */
       @keyframes flow {
@@ -33,11 +36,12 @@
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: #DADCE0;
+        background: #D1D5DB;
         border-radius: 10px;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #BDC1C6;
+      /* Prevent scrolling while dragging on mobile */
+      .dragging-active {
+        overflow: hidden !important;
       }
     </style>
   <script type="importmap">
