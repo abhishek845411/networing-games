@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { Option } from '../types';
 import { 
   Globe, Router, Activity, ShieldCheck, Network, 
@@ -15,8 +15,12 @@ interface OptionCardProps {
 }
 
 const OptionCard: React.FC<OptionCardProps> = ({ option, onDragStart, onDragEnd, isSelected, disabled }) => {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+  // Use springs for ultra-smooth drag following
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
+  
+  const springX = useSpring(dragX, { stiffness: 1000, damping: 50 });
+  const springY = useSpring(dragY, { stiffness: 1000, damping: 50 });
 
   // Official AWS Service Colors
   const getAWSBranding = () => {
@@ -49,38 +53,43 @@ const OptionCard: React.FC<OptionCardProps> = ({ option, onDragStart, onDragEnd,
     <motion.div
       layout
       drag={!disabled}
-      dragElastic={0.05} 
+      dragElastic={0.1}
       dragSnapToOrigin={true}
       dragMomentum={false} 
-      dragTransition={{ bounceStiffness: 1200, bounceDamping: 60 }}
+      // High-performance spring for snappy drag and release
+      dragTransition={{ bounceStiffness: 2000, bounceDamping: 60 }}
       onDragStart={onDragStart}
       // @ts-ignore
       onDragEnd={(_, info) => onDragEnd(option, info.point)}
-      whileHover={!disabled ? { scale: 1.05, y: -4, boxShadow: "0 8px 20px rgba(0,0,0,0.12)" } : {}}
+      whileHover={!disabled ? { 
+        scale: 1.05, 
+        y: -4, 
+        boxShadow: "0 10px 25px rgba(0,0,0,0.12)" 
+      } : {}}
       whileDrag={{ 
-        scale: 1.15, 
-        zIndex: 100, 
+        scale: 1.25, 
+        zIndex: 1000, 
         cursor: 'grabbing', 
-        boxShadow: "0 30px 60px rgba(0, 0, 0, 0.3)",
-        rotate: [0, 2, -2, 0],
-        transition: { rotate: { repeat: Infinity, duration: 0.2 } }
+        boxShadow: "0 35px 70px rgba(0, 0, 0, 0.4)",
+        rotate: [0, 3, -3, 0],
+        transition: { rotate: { repeat: Infinity, duration: 0.15 } }
       }}
       className={`
         relative p-4 md:p-6 rounded-2xl border-2 cursor-grab select-none bg-white
         flex flex-col items-center justify-center gap-3 md:gap-4 h-36 md:h-44 w-full transition-all duration-150
         ${isSelected 
-          ? 'border-green-500 ring-4 md:ring-8 ring-green-100 bg-green-50/10' 
+          ? 'border-green-500 ring-4 md:ring-8 ring-green-100 bg-green-50/10 shadow-lg' 
           : 'border-gray-100 hover:border-orange-200 shadow-sm'
         }
-        ${disabled && !isSelected ? 'opacity-40 cursor-not-allowed grayscale' : ''}
+        ${disabled && !isSelected ? 'opacity-30 cursor-not-allowed grayscale scale-95' : ''}
         touch-none
       `}
-      style={{ x, y }}
+      style={{ x: dragX, y: dragY }}
     >
       <motion.div 
-        animate={!disabled ? { scale: [1, 1.03, 1] } : {}}
-        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-        className={`w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white shadow-lg ${branding.bg}`}
+        animate={!disabled ? { scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] } : {}}
+        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+        className={`w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white shadow-xl ${branding.bg}`}
       >
         {branding.icon}
       </motion.div>

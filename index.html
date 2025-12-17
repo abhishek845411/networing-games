@@ -39,6 +39,14 @@
         background: #D1D5DB;
         border-radius: 10px;
       }
+      /* Hide scrollbar utility */
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
       /* Prevent scrolling while dragging on mobile */
       .dragging-active {
         overflow: hidden !important;

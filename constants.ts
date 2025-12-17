@@ -1,3 +1,4 @@
+
 import { Question } from './types';
 
 export const QUESTIONS: Question[] = [
@@ -15,28 +16,28 @@ export const QUESTIONS: Question[] = [
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "An Internet Gateway attaches to the VPC for public subnets. It allows bidirectional traffic (in and out), exposing the VM publicly."
+        explanation: "While an Internet Gateway provides connectivity, it is designed for Public Subnets. Using it here would require giving your VM a public IP, which exposes it to unsolicited inbound traffic from the entire internet—violating the 'outbound only' security requirement."
       },
       {
         id: "nat",
         label: "NAT Gateway",
         iconType: "nat",
         correct: true,
-        explanation: "Correct! A NAT Gateway allows instances in a private subnet to connect to the internet (e.g., for updates) but prevents the internet from initiating connections to those instances."
+        explanation: "Perfect! A NAT Gateway (Network Address Translation) lives in a public subnet and acts as a middleman. It allows instances in private subnets to reach the internet for updates while blocking any outside entity from initiating a direct connection back to your private VM."
       },
       {
         id: "alb",
         label: "Application Load Balancer",
         iconType: "balancer",
         correct: false,
-        explanation: "An ALB distributes incoming application traffic across multiple targets. It does not provide outbound internet access for a single VM."
+        explanation: "An Application Load Balancer (ALB) is a Layer 7 device designed to distribute incoming requests to a fleet of servers. It does not provide a mechanism for a server itself to initiate outbound connections to the public internet for software patches."
       },
       {
         id: "peering",
         label: "VPC Peering",
         iconType: "peering",
         correct: false,
-        explanation: "VPC Peering connects two VPCs together. It does not provide access to the public Internet."
+        explanation: "VPC Peering is a networking connection between two separate VPCs that allows you to route traffic between them using private IP addresses. It does not provide a path to the public internet."
       }
     ]
   },
@@ -54,28 +55,28 @@ export const QUESTIONS: Question[] = [
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "NAT Gateways are for outbound traffic only. They do not allow the outside world to initiate connections to your web server."
+        explanation: "NAT Gateways are 'one-way streets' for outbound traffic. They specifically prevent external users on the internet from initiating a connection to your server, which would make your web server unreachable for your users."
       },
       {
         id: "vpce",
         label: "VPC Endpoint",
         iconType: "endpoint",
         correct: false,
-        explanation: "VPC Endpoints are for connecting to AWS services privately, not for general internet traffic."
+        explanation: "VPC Endpoints are designed for private connectivity between your VPC and supported AWS services (like S3 or DynamoDB) without leaving the Amazon network. They do not provide general internet access."
       },
       {
         id: "igw",
         label: "Internet Gateway",
         iconType: "gateway",
         correct: true,
-        explanation: "Correct! An Internet Gateway (IGW) enables communication between instances in your VPC and the internet."
+        explanation: "Correct! An Internet Gateway (IGW) is a horizontally scaled, redundant, and highly available VPC component that allows communication between your VPC and the internet. It supports both inbound and outbound traffic for instances with public IPs."
       },
       {
         id: "vgw",
         label: "Virtual Private Gateway",
         iconType: "vpn",
         correct: false,
-        explanation: "A Virtual Private Gateway is used for VPN connections to an on-premise network, not the public internet."
+        explanation: "A Virtual Private Gateway is the VPN concentrator on the Amazon side of an Amazon Site-to-Site VPN connection. It connects your VPC to your on-premises network, not the public web."
       }
     ]
   },
@@ -93,28 +94,28 @@ export const QUESTIONS: Question[] = [
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "Using an IGW would require the traffic to go over the public internet, violating the security policy."
+        explanation: "An Internet Gateway routes traffic over the public internet to reach S3's public endpoints. This fails the security requirement to keep all log traffic within a private, controlled networking path."
       },
       {
         id: "vpce",
         label: "Gateway Endpoint",
         iconType: "endpoint",
         correct: true,
-        explanation: "Correct! A Gateway VPC Endpoint creates a private route to S3 without traffic ever leaving the Amazon network."
+        explanation: "Spot on! A Gateway VPC Endpoint for S3 adds a specific entry to your route table that directs S3 traffic through the Amazon private network backbone. No public IPs or internet traversal required, making it highly secure and cost-effective."
       },
       {
         id: "nat",
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "While a NAT Gateway works, the traffic technically leaves your VPC to hit the public AWS S3 endpoints. An Endpoint is more secure and cheaper."
+        explanation: "While a NAT Gateway allows a private VM to reach S3, the traffic still travels to S3's public service endpoints. Gateway Endpoints are preferred here because they provide a more direct, private, and free path to S3."
       },
       {
         id: "alb",
         label: "Load Balancer",
         iconType: "balancer",
         correct: false,
-        explanation: "Load balancers distribute traffic to VMs, they don't help VMs talk to storage services like S3."
+        explanation: "Load balancers handle incoming traffic from clients to servers. They have no role in helping a server communicate with an object storage service like Amazon S3."
       }
     ]
   },
@@ -132,28 +133,28 @@ export const QUESTIONS: Question[] = [
         label: "VPC Peering Connection",
         iconType: "peering",
         correct: true,
-        explanation: "Correct! VPC Peering allows networking connections between two VPCs, enabling them to route traffic using private IPv4 addresses."
+        explanation: "Correct! VPC Peering creates a direct network connection between two VPCs. Traffic is encrypted and stays on the global AWS backbone, allowing instances in either VPC to communicate as if they were on the same private network."
       },
       {
         id: "igw",
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "Routing traffic over the internet is not secure for internal company communication and adds latency."
+        explanation: "Routing traffic over the public internet using an IGW would require public IPs, VPNs, or complex NAT setups. Peering is the native, more secure, and higher-performance way to bridge two VPCs."
       },
       {
         id: "nat",
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "NAT Gateways are for internet access, not for connecting two private networks."
+        explanation: "NAT Gateways provide internet access for private subnets. They cannot be used to establish a private, bidirectional networking link between two distinct VPCs."
       },
       {
         id: "alb",
         label: "Application Load Balancer",
         iconType: "balancer",
         correct: false,
-        explanation: "ALBs are for HTTP traffic distribution, not for networking entire VPCs together."
+        explanation: "An ALB sits in front of applications to balance web traffic. It does not provide the underlying network routing required to connect two VPC infrastructures together."
       }
     ]
   },
@@ -171,28 +172,28 @@ export const QUESTIONS: Question[] = [
         label: "Virtual Private Gateway",
         iconType: "vpn",
         correct: true,
-        explanation: "Correct! The Virtual Private Gateway (VGW) is the VPN concentrator on the Amazon side of the Site-to-Site VPN connection."
+        explanation: "Exactly! The Virtual Private Gateway (VGW) acts as the 'VPN hub' on the AWS side. It terminates the encrypted IPsec tunnel coming from your office's Customer Gateway, bridging your on-premise network with your cloud VPC."
       },
       {
         id: "igw",
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "An IGW exposes resources to the public internet. It does not provide an encrypted tunnel for corporate access."
+        explanation: "An Internet Gateway is for public internet communication. While a VPN travels *over* the internet, the IGW itself doesn't handle the encryption, tunneling, or authentication required for a corporate VPN."
       },
       {
         id: "vpce",
         label: "VPC Endpoint",
         iconType: "endpoint",
         correct: false,
-        explanation: "Endpoints are for AWS services (like S3/DynamoDB), not for connecting on-premise networks."
+        explanation: "VPC Endpoints are used to access AWS services privately. They cannot be used to connect an external physical office or data center to your VPC."
       },
       {
         id: "nat",
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "NAT Gateways are for outbound internet access, not inbound corporate VPNs."
+        explanation: "NAT Gateways help private cloud instances reach the internet. They do not facilitate inbound encrypted connections from a corporate office to internal cloud tools."
       }
     ]
   },
@@ -210,28 +211,28 @@ export const QUESTIONS: Question[] = [
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "NAT is for outbound traffic. It cannot distribute inbound traffic across multiple servers."
+        explanation: "NAT Gateways translate internal private IPs to a single public IP for outbound requests. They lack the logic to inspect incoming HTTP headers or distribute requests across a pool of servers."
       },
       {
         id: "alb",
         label: "Application Load Balancer",
         iconType: "balancer",
         correct: true,
-        explanation: "Correct! An ALB operates at Layer 7 (HTTP/HTTPS) and distributes incoming traffic across multiple targets (EC2 instances) to ensure high availability."
+        explanation: "Correct! An ALB works at the Application Layer (Layer 7). It can inspect the content of requests (like URL paths or host headers) and intelligently route them to healthy servers in your target group, ensuring high availability and scalability."
       },
       {
         id: "igw",
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "The IGW allows traffic into the VPC, but it doesn't balance load. It just passes packets."
+        explanation: "The IGW is like the front door to the VPC—it lets traffic in, but it doesn't know how to distribute that traffic to specific servers. You need a Load Balancer behind the door to manage the crowd."
       },
       {
         id: "peering",
         label: "VPC Peering",
         iconType: "peering",
         correct: false,
-        explanation: "VPC Peering connects networks, it doesn't balance application traffic."
+        explanation: "VPC Peering connects two networks. It doesn't have any application-aware load balancing capabilities to handle millions of user requests."
       }
     ]
   },
@@ -249,28 +250,28 @@ export const QUESTIONS: Question[] = [
         label: "Transit Gateway",
         iconType: "transit",
         correct: true,
-        explanation: "Correct! AWS Transit Gateway connects your VPCs and on-premises networks through a central hub, simplifying your network and ending complex peering relationships."
+        explanation: "Spot on! AWS Transit Gateway acts as a cloud router. Instead of creating thousands of individual peering connections (a 'mesh'), every VPC and VPN connects to the Transit Gateway hub, greatly simplifying management and routing."
       },
       {
         id: "peering",
         label: "VPC Peering",
         iconType: "peering",
         correct: false,
-        explanation: "Managing peering connections between 50 VPCs (mesh) is complex and doesn't scale well. Transit Gateway is the better solution."
+        explanation: "Connecting 50 VPCs via peering would require 1,225 separate connections to create a full mesh. This is an operational nightmare to maintain, which is why Transit Gateway was created."
       },
       {
         id: "nat",
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "NAT Gateways are for internet access, not for interconnecting many private networks."
+        explanation: "NAT Gateways are for internet access within a single VPC. They cannot route traffic between dozens of different VPCs or back to a data center."
       },
       {
         id: "vpce",
         label: "VPC Endpoint",
         iconType: "endpoint",
         correct: false,
-        explanation: "VPC Endpoints connect to services, not to other VPCs in a mesh."
+        explanation: "VPC Endpoints connect a VPC to an AWS service. They are not designed for large-scale interconnectivity between many different VPCs and on-premises environments."
       }
     ]
   },
@@ -288,28 +289,28 @@ export const QUESTIONS: Question[] = [
         label: "Egress-Only Internet Gateway",
         iconType: "egress",
         correct: true,
-        explanation: "Correct! An Egress-Only Internet Gateway is for IPv6 traffic. It allows outbound communication over IPv6 while preventing inbound traffic."
+        explanation: "Correct! IPv6 addresses are public by default. To allow outbound connectivity while preventing inbound connections for IPv6, you use an Egress-Only Internet Gateway—essentially a NAT Gateway equivalent for the IPv6 world."
       },
       {
         id: "igw",
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "A standard Internet Gateway allows bidirectional (in and out) traffic. It doesn't block inbound connections by default for IPv6."
+        explanation: "In an IPv6 environment, a standard Internet Gateway allows bidirectional traffic. Because IPv6 instances don't use NAT, they would be globally reachable from the internet, which violates the 'outbound only' requirement."
       },
       {
         id: "nat",
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "NAT Gateways are primarily for IPv4. For IPv6, the pattern is to use an Egress-Only Internet Gateway."
+        explanation: "NAT Gateways are an IPv4 technology used to map private IPs to a public IP. IPv6 was designed with enough addresses to avoid NAT entirely, using Egress-Only IGWs for security instead."
       },
       {
         id: "alb",
         label: "Load Balancer",
         iconType: "balancer",
         correct: false,
-        explanation: "Load balancers do not provide outbound internet access for patching."
+        explanation: "Load balancers handle inbound traffic distribution. They do not provide a path for internal instances to reach out to the internet for software updates."
       }
     ]
   },
@@ -327,28 +328,28 @@ export const QUESTIONS: Question[] = [
         label: "Interface VPC Endpoint",
         iconType: "endpoint",
         correct: true,
-        explanation: "Correct! AWS PrivateLink (Interface Endpoint) allows you to securely access services hosted by other AWS accounts without using public IPs."
+        explanation: "Excellent! AWS PrivateLink allows you to consume services (SaaS) over a private Interface Endpoint. The service appears as an IP address in your own VPC, and traffic never touches the public internet."
       },
       {
         id: "igw",
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "Using an IGW means traffic goes over the public internet, which might violate security or compliance requirements."
+        explanation: "Using an IGW would require the SaaS provider to expose their service publicly. This would send your sensitive data across the public internet, which is less secure than using PrivateLink."
       },
       {
         id: "vgw",
         label: "VPN Gateway",
         iconType: "vpn",
         correct: false,
-        explanation: "VPNs are for connecting to on-premise networks, not typically used for consuming multi-tenant SaaS services efficiently."
+        explanation: "VPNs are great for connecting private offices, but they aren't the standard way to consume third-party SaaS applications hosted on AWS. PrivateLink is more scalable and easier to manage for service consumption."
       },
       {
         id: "nat",
         label: "NAT Gateway",
         iconType: "nat",
         correct: false,
-        explanation: "NAT Gateway provides internet access. The goal here is to avoid the public internet entirely."
+        explanation: "A NAT Gateway allows your VPC to reach public endpoints on the internet. Since the goal is to reach the SaaS provider *without* using the public internet, NAT is not the right choice."
       }
     ]
   },
@@ -366,28 +367,28 @@ export const QUESTIONS: Question[] = [
         label: "Direct Connect",
         iconType: "directconnect",
         correct: true,
-        explanation: "Correct! AWS Direct Connect bypasses the public internet to establish a dedicated physical connection between your network and AWS."
+        explanation: "Correct! AWS Direct Connect is a cloud service solution that makes it easy to establish a dedicated network connection from your premises to AWS. Using a 1Gbps or 10Gbps dedicated link provides much more consistent performance than a VPN."
       },
       {
         id: "vpn",
         label: "Site-to-Site VPN",
         iconType: "vpn",
         correct: false,
-        explanation: "VPNs go over the public internet and can be subject to network jitter and lower bandwidth limits compared to a dedicated line."
+        explanation: "Site-to-Site VPNs are easy to set up but travel over the public internet. This means bandwidth and latency fluctuate based on internet congestion, which doesn't meet the 'consistent low-latency' requirement for a high-end financial app."
       },
       {
         id: "igw",
         label: "Internet Gateway",
         iconType: "gateway",
         correct: false,
-        explanation: "Internet Gateways provide public internet access, which is not a dedicated private connection."
+        explanation: "An Internet Gateway provides a path to the public internet, not a private, dedicated physical link to your own data center."
       },
       {
         id: "tgw",
         label: "Transit Gateway",
         iconType: "transit",
         correct: false,
-        explanation: "Transit Gateway helps manage connections, but the *physical* dedicated link requirement is satisfied by Direct Connect."
+        explanation: "Transit Gateway is a hub for connecting VPCs and VPNs. While it's useful for routing, it doesn't provide the actual physical dedicated wire that Direct Connect offers."
       }
     ]
   },
@@ -405,28 +406,28 @@ export const QUESTIONS: Question[] = [
         label: "Global Accelerator",
         iconType: "accelerator",
         correct: true,
-        explanation: "Correct! AWS Global Accelerator uses the AWS global network to improve the performance of users' traffic by up to 60% using static IP addresses."
+        explanation: "Perfect! AWS Global Accelerator provides two static IP addresses that act as a fixed entry point to your application. It uses the global AWS network to route your users to the nearest healthy application endpoint, reducing latency and jitter."
       },
       {
         id: "cloudfront",
         label: "CloudFront",
         iconType: "cdn",
         correct: false,
-        explanation: "CloudFront is for caching content. While it improves speed, 'static anycast IPs for routing to applications' specifically describes Global Accelerator."
+        explanation: "CloudFront is a Content Delivery Network (CDN) primarily used for caching static content at the edge. Global Accelerator is designed specifically for accelerating TCP/UDP traffic to application endpoints using anycast IPs."
       },
       {
         id: "alb",
         label: "Load Balancer",
         iconType: "balancer",
         correct: false,
-        explanation: "ALBs are regional. They don't provide a single global static IP for users worldwide."
+        explanation: "ALBs are regional resources. While they balance traffic within a region, they don't provide a single global entry point or accelerate traffic across the global AWS backbone like Global Accelerator does."
       },
       {
         id: "route53",
         label: "Route 53",
         iconType: "gateway",
         correct: false,
-        explanation: "Route 53 handles DNS routing, but Global Accelerator provides the static entry point IPs and traffic acceleration over the AWS backbone."
+        explanation: "Route 53 is a DNS service. While it can perform 'latency-based routing' to different regions, it doesn't provide the dedicated network acceleration or static anycast IPs that Global Accelerator provides."
       }
     ]
   }

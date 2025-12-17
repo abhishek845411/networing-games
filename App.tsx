@@ -41,8 +41,9 @@ function App() {
 
     if (dropZoneRef.current) {
       const rect = dropZoneRef.current.getBoundingClientRect();
-      // Even more generous buffer for high-quality, "snappy" feel on mobile
-      const buffer = 100; 
+      // Expanded hit area for "fast acceptance" feel.
+      // We check if the drop point is anywhere near the drop zone.
+      const buffer = 120; 
       const isInside = 
         point.x >= rect.left - buffer && 
         point.x <= rect.right + buffer && 
@@ -131,7 +132,7 @@ function App() {
           className="h-full bg-[#FF9900] shadow-[0_0_8px_rgba(255,153,0,0.5)]" 
           initial={{ width: 0 }}
           animate={{ width: `${((gameState.currentQuestionIndex + 1) / QUESTIONS.length) * 100}%` }}
-          transition={{ type: 'spring', stiffness: 60, damping: 20 }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
         />
       </div>
 
@@ -153,14 +154,15 @@ function App() {
         </div>
       </header>
 
-      <main className="w-full max-w-5xl px-3 mt-6 flex-1 flex flex-col gap-5 overflow-x-hidden">
+      <main className="w-full max-w-5xl px-3 mt-6 flex-1 flex flex-col gap-5">
         
         {/* Scenario Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
           <motion.div 
             key={currentQuestion.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="text-center space-y-2"
           >
             <div className="inline-block px-3 py-0.5 bg-orange-100 text-[#FF9900] text-[9px] font-black rounded-full uppercase tracking-widest mb-2">
@@ -172,10 +174,15 @@ function App() {
         </div>
 
         {/* Visualizer Area */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-          <div className="relative p-2 md:p-6 lg:p-10 overflow-x-auto md:overflow-visible">
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 relative group">
+          {/* Horizontal scroll helper for mobile */}
+          <div className="absolute top-2 right-2 md:hidden animate-pulse bg-gray-100/80 px-2 py-1 rounded text-[10px] text-gray-400 font-bold z-20 pointer-events-none">
+            Slide to view full architecture →
+          </div>
+          
+          <div className="relative p-2 md:p-6 lg:p-10 overflow-x-auto overflow-y-hidden touch-pan-x scrollbar-hide md:overflow-visible">
             {/* The actual diagram */}
-            <div className="min-w-[700px] md:min-w-0">
+            <div className="min-w-[750px] md:min-w-0">
               <VPCVisualizer 
                 scenarioType={currentQuestion.scenarioType}
                 isCorrect={gameState.isLevelComplete}
@@ -192,14 +199,18 @@ function App() {
                   gameState.isLevelComplete 
                   ? { scale: 1.05, backgroundColor: 'rgba(52, 168, 83, 0.05)', borderColor: '#34A853', opacity: 1 } 
                   : isDragging 
-                  ? { scale: 1.05, borderColor: '#FF9900', opacity: 1, backgroundColor: 'rgba(255, 153, 0, 0.08)' }
+                  ? { scale: 1.1, borderColor: '#FF9900', opacity: 1, backgroundColor: 'rgba(255, 153, 0, 0.08)' }
                   : { scale: 1, opacity: 0 }
                 }
-                className="w-40 h-32 md:w-48 md:h-40 rounded-2xl border-4 border-dashed flex items-center justify-center z-30 transition-all duration-150"
+                className="w-40 h-32 md:w-56 md:h-48 rounded-3xl border-4 border-dashed flex items-center justify-center z-30 transition-all duration-200"
               >
                  {isDragging && !gameState.isLevelComplete && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-1">
-                      <div className="text-3xl">🎯</div>
+                    <motion.div 
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                      className="flex flex-col items-center gap-1"
+                    >
+                      <div className="text-4xl">🎯</div>
                       <span className="text-[#FF9900] font-black text-[10px] uppercase tracking-tighter">Target Zone</span>
                     </motion.div>
                  )}

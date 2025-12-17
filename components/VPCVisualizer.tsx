@@ -82,7 +82,6 @@ const VPCVisualizer: React.FC<VPCVisualizerProps> = ({ scenarioType, isCorrect, 
                     ${isCorrect ? 'bg-green-50/80 border-green-500 shadow-green-100' : 'bg-gray-50/50 border-gray-300'}`}>
                     <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center mb-2 border shadow-sm transition-transform duration-500
                       ${isCorrect ? 'bg-green-100 border-green-200 scale-110' : 'bg-white border-gray-100'}`}>
-                        {/* Fixed: Use Tailwind responsive classes instead of non-existent md:size prop */}
                         <ShieldCheck className={`${isCorrect ? "text-green-600" : "text-gray-300"} w-5 h-5 md:w-6 md:h-6`} strokeWidth={2.5} />
                     </div>
                     <span className="text-[7px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest">Gateway</span>
@@ -97,7 +96,6 @@ const VPCVisualizer: React.FC<VPCVisualizerProps> = ({ scenarioType, isCorrect, 
           <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-gray-50 flex items-center justify-center shadow-xl relative ring-1 ring-gray-100">
              {renderDest()}
              <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-7 h-7 md:w-9 md:h-9 bg-[#FF9900] rounded-full flex items-center justify-center border-4 border-white shadow-lg">
-                {/* Fixed: Use Tailwind responsive classes instead of non-existent md:size prop */}
                 <ArrowRight className="text-white w-3.5 h-3.5 md:w-4.5 md:h-4.5" strokeWidth={3} />
              </div>
           </div>
@@ -108,21 +106,27 @@ const VPCVisualizer: React.FC<VPCVisualizerProps> = ({ scenarioType, isCorrect, 
       {/* SVG Networking Visualizer */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 800 350">
         <defs>
-          <marker id="arrowhead-aws" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill={colors.connector} />
+          <marker id="arrowhead-aws" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+            <path d="M0,0 L0,10 L10,5 z" fill={colors.connector} />
           </marker>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
         </defs>
 
-        {/* Improved centralized flow lines */}
+        {/* Path 1: Source to Gateway */}
         <path 
-          d="M 240 175 L 340 175" 
+          d="M 230 175 L 340 175" 
           fill="none" 
           stroke={colors.connector} 
           strokeWidth="6" 
           strokeLinecap="round"
           className={isCorrect ? "traffic-active" : ""}
+          filter={isCorrect ? "url(#glow)" : ""}
         />
 
+        {/* Path 2: Gateway to Destination */}
         <path 
           d="M 500 175 L 685 175" 
           fill="none" 
@@ -131,20 +135,47 @@ const VPCVisualizer: React.FC<VPCVisualizerProps> = ({ scenarioType, isCorrect, 
           strokeLinecap="round"
           markerEnd="url(#arrowhead-aws)"
           className={isCorrect ? "traffic-active" : ""}
+          filter={isCorrect ? "url(#glow)" : ""}
         />
         
-        {/* Animated flow markers */}
+        {/* Multi-particle animated flow for high quality feel */}
         {isCorrect && (
           <>
-            <motion.circle r="4" fill="#31B404" 
-              initial={{ cx: 240, cy: 175 }}
-              animate={{ cx: 685 }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+            {/* Fix: Replaced invalid 'shadow' prop with style.filter to apply the glow effect to the leading particle */}
+            <motion.circle r="5" fill="#31B404" style={{ filter: 'drop-shadow(0 0 10px #31B404)' }}
+              initial={{ cx: 230, cy: 175, opacity: 0 }}
+              animate={{ cx: 685, opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             />
-            <motion.circle r="4" fill="#31B404" 
-              initial={{ cx: 240, cy: 175 }}
-              animate={{ cx: 685 }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: "linear", delay: 0.6 }}
+            <motion.circle r="4" fill="#31B404" opacity="0.6"
+              initial={{ cx: 230, cy: 175, opacity: 0 }}
+              animate={{ cx: 685, opacity: [0, 0.6, 0.6, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            />
+            <motion.circle r="3" fill="#31B404" opacity="0.4"
+              initial={{ cx: 230, cy: 175, opacity: 0 }}
+              animate={{ cx: 685, opacity: [0, 0.4, 0.4, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }}
+            />
+            
+            {/* Directional arrow indicators moving along the path */}
+            <motion.path
+              d="M -10 -5 L 0 0 L -10 5"
+              fill="none"
+              stroke="#31B404"
+              strokeWidth="2"
+              initial={{ x: 230, y: 175, opacity: 0 }}
+              animate={{ x: 685, opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.2 }}
+            />
+            <motion.path
+              d="M -10 -5 L 0 0 L -10 5"
+              fill="none"
+              stroke="#31B404"
+              strokeWidth="2"
+              initial={{ x: 230, y: 175, opacity: 0 }}
+              animate={{ x: 685, opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.7 }}
             />
           </>
         )}
