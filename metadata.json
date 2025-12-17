@@ -1,0 +1,5 @@
+{
+  "name": "CloudNet Quest",
+  "description": "An interactive drag-and-drop game to learn Cloud Networking concepts.",
+  "requestFramePermissions": []
+}
